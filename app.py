@@ -9,6 +9,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 
+# Defines a Todo as a data item that has an id, a title, and a complete status.
 class Todo(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100))
@@ -17,11 +18,13 @@ class Todo(db.Model):
 
 @app.route("/")
 def home():
+    # passes todo items to the template
     todo_list = Todo.query.all()
     return render_template("base.html", todo_list=todo_list)
 
 @app.route("/add", methods=["POST"])
 def add():
+    # creates a new todo item with the title from the form
     title = request.form.get("title")
     new_todo = Todo(title=title, complete=False)
     db.session.add(new_todo)
@@ -30,6 +33,7 @@ def add():
 
 @app.route("/update/<int:todo_id>")
 def update(todo_id):
+    # updates the complete status of a todo item
     todo = Todo.query.filter_by(id=todo_id).first()
     todo.complete = not todo.complete
     db.session.commit()
@@ -37,6 +41,7 @@ def update(todo_id):
 
 @app.route("/delete/<int:todo_id>")
 def delete(todo_id):
+    # deletes a todo item
     todo = Todo.query.filter_by(id=todo_id).first()
     db.session.delete(todo)
     db.session.commit()
